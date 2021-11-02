@@ -16,10 +16,20 @@ namespace FilmesAPI.Data
                 .HasOne(endereco => endereco.Cinema)
                 .WithOne(cinema => cinema.Endereco)
                 .HasForeignKey<Cinema>(cinema => cinema.EnderecoId);
+            //HasForeignKey<Cinema> - não explicitar novamente se for a mesma classe do início (Entity<Cinema>)
+
+            builder.Entity<Cinema>()
+                .HasOne(cinema => cinema.Gerente)
+                .WithMany(gerente => gerente.Cinemas)
+                .HasForeignKey(cinema => cinema.GerenteId);
+                
+                //.IsRequired(false); Fk pode ser nula
+                //.OnDelete(DeleteBehavior.Restrict) nao permitir deletar em cascata
         }
 
         public DbSet<Filme> Filmes { get; set; }
         public DbSet<Cinema> Cinemas { get; set; }
         public DbSet<Endereco> Enderecos { get; set; }
+        public DbSet<Gerente> Gerentes { get; set; }
     }
 }
