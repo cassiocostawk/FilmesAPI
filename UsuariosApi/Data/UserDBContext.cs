@@ -6,10 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UsuariosApi.Models;
 
 namespace UsuariosApi.Data
 {
-    public class UserDBContext : IdentityDbContext<IdentityUser<int>, IdentityRole<int>, int>
+    public class UserDBContext : IdentityDbContext<CustomIdentityUser, IdentityRole<int>, int>
     {
         private IConfiguration _configuration;
 
@@ -22,7 +23,7 @@ namespace UsuariosApi.Data
         {
             base.OnModelCreating(builder);
 
-            IdentityUser<int> admin = new IdentityUser<int>
+            CustomIdentityUser admin = new CustomIdentityUser
             {
                 UserName = "admin",
                 NormalizedUserName = "ADMIN",
@@ -34,14 +35,14 @@ namespace UsuariosApi.Data
             };
 
             // criptografar a nova senha
-            PasswordHasher<IdentityUser<int>> hasher = new PasswordHasher<IdentityUser<int>>();
+            PasswordHasher<CustomIdentityUser> hasher = new PasswordHasher<CustomIdentityUser>();
 
             // usar string que é menos seguro ou secrets
             // admin.PasswordHash = hasher.HashPassword(admin, "Admin123!"); 
             admin.PasswordHash = hasher.HashPassword(admin, _configuration.GetValue<string>("admininfo:password"));
 
             // buildar o dado
-            builder.Entity<IdentityUser<int>>().HasData(admin); 
+            builder.Entity<CustomIdentityUser>().HasData(admin); 
 
             // Role Admin
             builder.Entity<IdentityRole<int>>().HasData(
