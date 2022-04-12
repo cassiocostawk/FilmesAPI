@@ -1,6 +1,8 @@
+using FilmesApi.Authorization;
 using FilmesAPI.Data;
 using FilmesAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -46,11 +48,22 @@ namespace FilmesAPI
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("0asdjas09djsa09djasdjsadajsd09asjd09sajcnzxn")),
-                    ValidateIssuer = false,
+                    ValidateIssuer = false, // hierarquia de permissão
                     ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero // sincronizar o tempo de expcom uma margem (inclinação do relógio)
                 };
             });
+
+            // adicionar a politica de segurança
+            services.AddAuthorization(options =>
+                options.AddPolicy("IdadeMinima", policy =>
+                {
+                    policy.Requirements.Add(new IdadeMinimaRequirement(18));
+                })
+            );
+
+            // injeção do serviço de autorização do handler
+            services.AddSingleton<IAuthorizationHandler, IdadeMinimaHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
